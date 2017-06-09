@@ -257,26 +257,6 @@ AS
 go
 
 
--- TempUserView
-CREATE VIEW smgt.tempuserview
-AS
-    SELECT a.fullname,
-            CONVERT(UNIQUEIDENTIFIER, a.systemuserid)       AS systemuserid,
-            CONVERT(UNIQUEIDENTIFIER, a.parentsystemuserid) AS parentsystemuserid,
-            a.hierarchylevel,
-            systemuser_1.fullname                           AS managername
-    FROM   (
-                SELECT dbo.systemuser.fullname,
-                    dbo.systemuser.systemuserid,
-                    dbo.systemusermanagermap.parentsystemuserid,
-                    dbo.systemusermanagermap.hierarchylevel
-                FROM   dbo.systemusermanagermap LEFT OUTER JOIN dbo.systemuser ON dbo.systemusermanagermap.systemuserid = dbo.systemuser.systemuserid
-            ) AS a
-            LEFT OUTER JOIN dbo.systemuser AS systemuser_1 ON a.parentsystemuserid = systemuser_1.systemuserid
-    WHERE  a.hierarchylevel = 1 AND
-            systemuser_1.isdisabled = 0;
-go
-
 -- TerritoryView
 CREATE VIEW smgt.territoryview
 AS
@@ -323,28 +303,14 @@ go
 -- UserView
 CREATE VIEW smgt.userview
 AS
-    SELECT  fullname           AS [Full Name],
-            systemuserid       AS [User Id],
-            parentsystemuserid AS [Parent User Id],
-            hierarchylevel     AS [Hierarchy Level],
-            managername        AS [Manager Name]
-    FROM   smgt.tempuserview
-    UNION ALL
-    SELECT  b.fullname                             AS [Full Name],
-            b.systemuserid                         AS [User Id],
-            '00000000-0000-0000-0000-000000000000' AS [Parent User Id],
-            1                                      AS [Hierarchy Level],
-            'Root'                                 AS [Manager Name]
-    FROM   (
-               SELECT DISTINCT fullname, systemuserid
-               FROM   dbo.systemuser
-               WHERE  isdisabled = 0 AND
-                      systemuserid NOT IN (SELECT DISTINCT systemuserid FROM smgt.tempuserview)
-           ) AS b
-    UNION ALL
-    SELECT  'Root'                                 AS [Full Name],
-            '00000000-0000-0000-0000-000000000000' AS [User Id],
-            '00000000-0000-0000-0000-000000000000' AS [Parent User Id],
-            1                                      AS [Hierarchy Level],
-            'Root'                                 AS [Manager Name];
+    WITH OrderedUSers(fullname, systemuserid, parentsystemuserid, hierarchylevel, managername) AS (
+        SELECT fullname, systemuserid, parentsystemuserid, 0 AS hierarchylevel, CAST(NULL AS NVARCHAR(250)) AS managername
+        FROM dbo.systemuser su
+	    WHERE parentsystemuserid IS NULL AND isdisabled=0 AND EXISTS (SELECT parentsystemuserid FROM dbo.systemuser WHERE isdisabled=0 AND parentsystemuserid=su.systemuserid)
+	    UNION ALL
+	    SELECT su.fullname, su.systemuserid, su.parentsystemuserid, OrderedUSers.hierarchylevel+1 AS hierarchylevel, CAST(OrderedUSers.fullname AS NVARCHAR(250)) AS managername
+	    FROM dbo.systemuser su INNER JOIN OrderedUSers ON su.parentsystemuserid=OrderedUSers.systemuserid
+	    WHERE su.isdisabled = 0
+    )
+    SELECT * FROM OrderedUSers;
 go

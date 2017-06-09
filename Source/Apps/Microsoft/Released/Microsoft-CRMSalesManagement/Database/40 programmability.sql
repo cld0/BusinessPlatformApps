@@ -16,7 +16,7 @@ BEGIN
                        INNER JOIN sys.schemas sc ON ta.schema_id = sc.schema_id
     WHERE
         sc.name='dbo' AND ta.is_ms_shipped = 0 AND pa.index_id IN (0,1) AND
-        ta.name IN ('opportunityproduct', 'territory', 'lead', 'opportunity', 'account', 'systemusermanagermap', /* 'businessunit', */ 'systemuser', 'product', 'team')
+        ta.name IN ('opportunityproduct', 'territory', 'lead', 'opportunity', 'account', /* 'businessunit', */ 'systemuser', 'product', 'team')
     GROUP BY ta.name
     ORDER BY ta.name;
 END;
@@ -41,7 +41,7 @@ BEGIN
                        INNER JOIN sys.schemas sc ON ta.schema_id = sc.schema_id
     WHERE
         sc.name='dbo' AND ta.is_ms_shipped = 0 AND pa.index_id IN (0,1) AND
-	    ta.name IN ('opportunityproduct', 'territory', 'lead', 'opportunity', 'account', 'systemusermanagermap', /* 'businessunit', */ 'systemuser', 'product', 'team')
+	    ta.name IN ('opportunityproduct', 'territory', 'lead', 'opportunity', 'account', /* 'businessunit', */ 'systemuser', 'product', 'team')
     GROUP BY ta.[name];
 
 SELECT CASE
@@ -135,7 +135,7 @@ BEGIN
     SELECT Count(*) AS ExistingObjectCount
     FROM   information_schema.tables
     WHERE  ( table_schema = 'dbo' AND
-             table_name IN ('account', 'businessunit', 'lead', 'opportunity', 'opportunityproduct', 'product', 'team', 'systemuser', 'systemusermanagermap', 'territory')
+             table_name IN ('account', 'businessunit', 'lead', 'opportunity', 'opportunityproduct', 'product', 'team', 'systemuser', 'territory')
            ) OR
            ( table_schema = 'smgt' AND
              table_name IN ('AccountView', 'BusinessUnitView', 'configuration', 'ConfigurationView', 'date', 'DateView',

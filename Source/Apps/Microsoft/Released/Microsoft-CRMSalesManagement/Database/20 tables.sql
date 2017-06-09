@@ -1069,19 +1069,6 @@ CREATE TABLE dbo.systemuser
 );
 
 
--- SystemUserManagerMap
--- CRM internal table
-CREATE TABLE dbo.systemusermanagermap
-(
-  hierarchylevel         INT NULL,
-  versionnumber          BIGINT NULL,
-  parentsystemuserid     UNIQUEIDENTIFIER NULL,
-  systemusermanagermapid UNIQUEIDENTIFIER NULL,
-  systemuserid           UNIQUEIDENTIFIER NULL
-);
-CREATE INDEX idx_systemusermanagermap_systemuser_id ON dbo.systemusermanagermap(systemuserid) INCLUDE (parentsystemuserid);
-
-
 -- Territory
 -- CRM internal table
 CREATE TABLE dbo.territory

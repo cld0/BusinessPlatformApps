@@ -106,7 +106,6 @@ BEGIN
 				 'product',
 				 'team',
 				 'systemuser',
-				 'systemusermanagermap',
 				 'territory'));
     if(@returnValue = 13)
     BEGIN
@@ -146,8 +145,6 @@ BEGIN
 			SELECT Count(*) AS tableCount FROM dbo.team
 			UNION ALL
 			SELECT Count(*) AS tableCount FROM dbo.systemuser
-			UNION ALL
-			SELECT Count(*) AS tableCount FROM dbo.systemusermanagermap
 			UNION ALL
 			SELECT Count(*) AS tableCount FROM dbo.territory
         ) AS temp;

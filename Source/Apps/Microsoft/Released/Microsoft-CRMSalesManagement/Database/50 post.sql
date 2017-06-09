@@ -19,7 +19,6 @@ DROP TABLE dbo.opportunityproduct;
 DROP TABLE dbo.product;
 DROP TABLE dbo.team;
 DROP TABLE dbo.systemuser;
-DROP TABLE dbo.systemusermanagermap;
 DROP TABLE dbo.territory;
 
 -- Looks like these need to be remove, too
